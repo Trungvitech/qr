@@ -95,7 +95,7 @@
 
         function IsEmpty() {
             if (document.querySelector('.input-ws').value === "") {
-                alert("工程を入力してください-Hãy nhập nội dung công việc của bạn");
+                alert("Hãy nhập nội dung công việc của bạn");
                 return false;
             }
             return true;
@@ -104,7 +104,7 @@
         function sendData() {
             if (!IsEmpty()) return;
             if (document.querySelector('.input-code').value === "") {
-                alert("QRコードを入力してください-Hãy nhập mã hàng");
+                alert("Hãy nhập mã hàng");
                 return false;
             }
             const API_URL = "https://script.google.com/macros/s/AKfycbxO7s0bp3I746PVpSD8ycVZ--Z_M0TDu5JS4UjgEeGqauH9sQgXmgAI5kcQkX9HFtGneQ/exec";
