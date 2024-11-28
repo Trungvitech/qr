@@ -47,30 +47,28 @@
         <p class="control">
             <button class="button is-warning" onclick="ChangeCode()">QR-Code</button>
         </p>
-        <p class="control">
-            <button class="button is-primary" onclick="openPage()">棚卸</button>
-        </p>
+        
     </div>
 
-    <input class="input is-normal input-name is-fullwidth" placeholder="Nameー名前" id="Name">
-    <input class="input is-normal input-ws is-fullwidth" placeholder="Work stationー工程ー機械ー場所" id="WS">
-    <input class="input is-normal is-warning input-Number" placeholder="Number-数量" id="Number-code">
-    <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Codeー図面コード" id="code">
+    <input class="input is-normal input-name is-fullwidth" placeholder="Name" id="Name">
+    <input class="input is-normal input-ws is-fullwidth" placeholder="Work station" id="WS">
+    <input class="input is-normal is-warning input-Number" placeholder="Number" id="Number-code">
+    <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
     
     <div class="field is-horizontal">
         <div class="field-label is-normal">
-            <label class="label">不良/不足数</label>
+            <label class="label">NG</label>
         </div>
         <div class="field-body">
             <div class="field">
                 <p class="control">
-                    <input class="input is-small input-NG" placeholder="不良数/不足数-Số hàng hỏng hoặc thiếu" id="NG-code">
+                    <input class="input is-small input-NG" placeholder="NG-Số hàng hỏng hoặc thiếu" id="NG-code">
                 </p>
             </div>
         </div>
     </div>
 
-    <button class="button is-danger is-fullwidth" onclick="sendData()">Save-保存</button>
+    <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
 
     <!-- Camera QR Code Reader -->
     <div id="reader"></div>
