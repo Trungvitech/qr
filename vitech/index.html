@@ -47,7 +47,6 @@
         <p class="control">
             <button class="button is-warning" onclick="ChangeCode()">QR-Code</button>
         </p>
-        
     </div>
 
     <input class="input is-normal input-name is-fullwidth" placeholder="Name" id="Name">
@@ -74,6 +73,8 @@
     <div id="reader"></div>
 
     <script>
+        let html5QrCode;
+
         function openPage() {
             window.open("https://ohshima-kousakusho.github.io/tana1/", "_blank");
         }
@@ -104,9 +105,10 @@
         function sendData() {
             if (!IsEmpty()) return;
             if (document.querySelector('.input-code').value === "") {
-                alert("Hãy nhập mã hàng");
+                alert("Hãy nhập mã hàng hoặc quét mã QR.");
                 return false;
             }
+
             const API_URL = "https://script.google.com/macros/s/AKfycbxO7s0bp3I746PVpSD8ycVZ--Z_M0TDu5JS4UjgEeGqauH9sQgXmgAI5kcQkX9HFtGneQ/exec";
             const options = {
                 method: 'POST',
@@ -119,15 +121,17 @@
                     class: document.querySelector('.input-code').value
                 })
             };
+
             fetch(API_URL, options)
                 .then(response => response.json())
-                .then(data => console.log(data));
-            
-            document.querySelector('.input-code').value = '';
-            document.querySelector('.input-Number').value = '';
-            document.querySelector('.input-NG').value = '';
-            document.getElementById("code").focus();
-            play();
+                .then(data => {
+                    console.log(data);
+                    document.querySelector('.input-code').value = '';
+                    document.querySelector('.input-Number').value = '';
+                    document.querySelector('.input-NG').value = '';
+                    document.getElementById("code").focus();
+                    play();
+                });
         }
 
         function play() {
@@ -135,41 +139,18 @@
             audio.play();
         }
 
-        const config = { fps: 5, qrbox: 450 };
-        let html5QrCode;
-
         function onScanSuccess(qrCodeMessage) {
-            html5QrCode.stop();
-            const API_URL = "https://script.google.com/macros/s/AKfycbxO7s0bp3I746PVpSD8ycVZ--Z_M0TDu5JS4UjgEeGqauH9sQgXmgAI5kcQkX9HFtGneQ/exec";
-            const options = {
-                method: 'POST',
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    name: document.querySelector('.input-name').value,
-                    ws: document.querySelector('.input-ws').value,
-                    Number: document.querySelector('.input-Number').value,
-                    NG: document.querySelector('.input-NG').value,
-                    class: qrCodeMessage
-                })
-            };
-            fetch(API_URL, options)
-                .then(response => response.json())
-                .then(data => startScan());
-            
-            document.querySelector('.input-code').value = '';
-            document.querySelector('.input-Number').value = '';
-            document.querySelector('.input-NG').value = '';
+            document.querySelector('.input-code').value = qrCodeMessage; // Gán giá trị vào input
+            html5QrCode.stop(); // Dừng camera sau khi quét thành công
         }
 
         function startScan() {
-            IsEmpty();
             document.getElementById('reader').innerHTML = '';
             html5QrCode = new Html5Qrcode('reader');
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
-            play();
+            html5QrCode.start({ facingMode: "environment" }, { fps: 5, qrbox: 450 }, onScanSuccess);
         }
 
-        startScan(); 
+        startScan(); // Bắt đầu quét QR code
     </script>
 </body>
 </html>
