@@ -50,7 +50,7 @@
     </div>
 
     <input class="input is-normal input-name is-fullwidth" placeholder="Người kiểm" id="Name">
-    <input class="input is-normal input-ws is-fullwidth" placeholder="=Bộ phận" id="WS">
+    <input class="input is-normal input-ws is-fullwidth" placeholder="Bộ phận" id="WS">
     <input class="input is-normal is-warning input-Number" placeholder="Số lượng" id="Number-code">
     <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
     
@@ -131,6 +131,8 @@
                     document.querySelector('.input-NG').value = '';
                     document.getElementById("code").focus();
                     play();
+                    // Khởi động lại camera
+                    startScan();
                 });
         }
 
