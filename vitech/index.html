@@ -40,6 +40,17 @@
 
         .column-workstation { width: 15%; }
         .column-code { width: 40%; }
+        #data-container {
+            display: none; /* Ẩn danh sách lưu tạm mặc định */
+        }
+
+        input {
+            width: 100%; /* Chiều rộng full màn hình */
+        }
+
+        .input-field {
+            margin-bottom: 20px; /* Khoảng cách giữa các input */
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.0.3/html5-qrcode.min.js"></script>
 </head>
@@ -56,13 +67,22 @@
 
     <!-- Các trường nhập dữ liệu -->
     <div id="input-fields">
-        <input class="input is-normal input-name is-fullwidth" placeholder="Tên" id="Name">
-        <input class="input is-normal input-ws is-fullwidth" placeholder="Tình trạng" id="WS">
-        <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
+        <div class="input-field">
+            <input class="input is-normal input-name" placeholder="Tên" id="Name">
+        </div>
+        <div class="input-field">
+            <input class="input is-normal input-ws" placeholder="Tình trạng" id="WS">
+        </div>
+        <div class="input-field">
+            <input class="input is-rounded is-large input-code" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
+        </div>
     </div>
 
     <!-- Nút lưu dữ liệu -->
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save-保存</button>
+
+    <!-- Nút mở danh sách -->
+    <button class="button is-link is-fullwidth" onclick="toggleDataContainer()">Mở Danh Sách Lưu Tạm</button>
 
     <!-- Vùng hiển thị Camera QR Code -->
     <div style="width: 800px; margin: 0 auto;" id="reader"></div>
@@ -173,6 +193,11 @@
             ).catch(err => {
                 document.getElementById("error-message").innerText = "Không thể khởi động camera: " + err;
             });
+        }
+
+        function toggleDataContainer() {
+            const container = document.getElementById('data-container');
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
         }
 
         // Tự động mở camera khi trang tải
