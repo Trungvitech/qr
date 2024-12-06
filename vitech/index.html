@@ -40,7 +40,6 @@
 
         .column-workstation { width: 15%; }
         .column-code { width: 40%; }
-        .shift-down { margin-top: 20px; transition: margin-top 0.5s ease-in-out; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.0.3/html5-qrcode.min.js"></script>
 </head>
@@ -48,15 +47,11 @@
     <!-- Các nút chức năng -->
     <div class="field is-grouped">
         <p class="control">
-            <button class="button is-info" onclick="ChangeName()">名前-NAME</button>
+            <button class="button is-info" onclick="ChangeName()">Tên</button>
         </p>
         <p class="control">
-            <button class="button is-success" onclick="ChangeWS()">工程-WORK</button>
+            <button class="button is-success" onclick="ChangeWS()">Tình trạng</button>
         </p>
-        <p class="control">
-            <button class="button is-warning" onclick="ChangeCode()">QR-Code</button>
-        </p>
-        
     </div>
 
     <!-- Các trường nhập dữ liệu -->
@@ -64,26 +59,21 @@
         <input class="input is-normal input-name is-fullwidth" placeholder="Nameー名前" id="Name">
         <input class="input is-normal input-ws is-fullwidth" placeholder="Work stationー工程ー機械ー場所" id="WS">
         <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
-        <div id="optional-fields" style="display: none;">
+        <div id="optional-fields">
             <input class="input is-normal is-large input-Number" placeholder="Number-数量" id="Number-code">
             <input class="input is-small input-NG" placeholder="不良数/不足数-Số hàng hỏng hoặc thiếu" id="NG-code">
         </div>
     </div>
-    <button class="button is-info" onclick="toggleOptionalFields()">Thêm/Sửa Thông Tin Chi Tiết</button>
 
     <!-- Nút lưu dữ liệu -->
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save-保存</button>
-
-    <!-- Nút ẩn/hiện danh sách -->
-    <button class="button is-link is-fullwidth" onclick="toggleDataList()">Ẩn/Hiện Danh Sách</button>
 
     <!-- Vùng hiển thị Camera QR Code -->
     <div style="width: 800px; margin: 0 auto;" id="reader"></div>
     <div id="error-message" style="color: red; text-align: center; margin-top: 10px;"></div>
 
     <!-- Bảng hiển thị dữ liệu đã nhập -->
-    <div class="container is-fluid" id="data-container" style="display: none;">
-       
+    <div class="container is-fluid" id="data-container">
         <h2 class="title">データ一覧 - Danh sách dữ liệu đã nhập</h2>
         <div class="scrollable-list">
             <table class="table is-fullwidth is-bordered">
@@ -102,10 +92,6 @@
     </div>
 
     <script>
-        function openPage() {
-            window.open("https://ohshima-kousakusho.github.io/tana1/", "_blank");
-        }
-
         function ChangeName() {
             document.querySelector('.input-name').value = '';
             document.getElementById("Name").focus();
@@ -116,27 +102,12 @@
             document.getElementById("WS").focus();
         }
 
-        function ChangeCode() {
-            document.querySelector('.input-code').value = '';
-            document.getElementById("code").focus();
-        }
-
         function IsEmpty() {
             if (document.querySelector('.input-ws').value === "") {
                 alert("工程を入力してください-Hãy nhập nội dung công việc của bạn");
                 return false;
             }
             return true;
-        }
-
-        function toggleDataList() {
-            const dataContainer = document.getElementById('data-container');
-            dataContainer.style.display = dataContainer.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function toggleOptionalFields() {
-            const optionalFields = document.getElementById('optional-fields');
-            optionalFields.style.display = optionalFields.style.display === 'none' ? 'block' : 'none';
         }
 
         function sendData() {
@@ -194,6 +165,23 @@
             var audio = new Audio('https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3'); 
             audio.play(); 
         }
+
+        // Tích hợp camera QR Code
+        const html5QrCode = new Html5Qrcode("reader");
+        const qrCodeSuccessCallback = (decodedText) => {
+            document.querySelector('.input-code').value = decodedText;
+            html5QrCode.stop();
+            document.getElementById("code").focus();
+            play();
+        };
+
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            qrCodeSuccessCallback
+        ).catch(err => {
+            document.getElementById("error-message").innerText = "Không thể khởi động camera: " + err;
+        });
     </script>
 </body>
 </html>
