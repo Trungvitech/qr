@@ -56,13 +56,9 @@
 
     <!-- Các trường nhập dữ liệu -->
     <div id="input-fields">
-        <input class="input is-normal input-name is-fullwidth" placeholder="Nameー名前" id="Name">
-        <input class="input is-normal input-ws is-fullwidth" placeholder="Work stationー工程ー機械ー場所" id="WS">
+        <input class="input is-normal input-name is-fullwidth" placeholder="Tên" id="Name">
+        <input class="input is-normal input-ws is-fullwidth" placeholder="Tình trạng" id="WS">
         <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
-        <div id="optional-fields">
-            <input class="input is-normal is-large input-Number" placeholder="Number-数量" id="Number-code">
-            <input class="input is-small input-NG" placeholder="不良数/不足数-Số hàng hỏng hoặc thiếu" id="NG-code">
-        </div>
     </div>
 
     <!-- Nút lưu dữ liệu -->
@@ -82,8 +78,6 @@
                         <th>Name</th>
                         <th class="column-workstation">Workstation</th>
                         <th class="column-code">Code</th>
-                        <th>Number</th>
-                        <th>NG</th>
                     </tr>
                 </thead>
                 <tbody id="data-table-body"></tbody>
@@ -92,6 +86,8 @@
     </div>
 
     <script>
+        let html5QrCode;
+
         function ChangeName() {
             document.querySelector('.input-name').value = '';
             document.getElementById("Name").focus();
@@ -104,7 +100,7 @@
 
         function IsEmpty() {
             if (document.querySelector('.input-ws').value === "") {
-                alert("工程を入力してください-Hãy nhập nội dung công việc của bạn");
+                alert("Hãy nhập nội dung công việc của bạn");
                 return false;
             }
             return true;
@@ -114,23 +110,21 @@
             if (!IsEmpty()) return;
 
             if (document.querySelector('.input-code').value === "") {
-                alert("QRコードを入力してください-Hãy nhập mã hàng");
+                alert("Hãy nhập mã hàng");
                 return false;
             }
 
             const name = document.querySelector('.input-name').value;
             const ws = document.querySelector('.input-ws').value;
             const code = document.querySelector('.input-code').value;
-            const number = document.querySelector('.input-Number').value;
-            const ng = document.querySelector('.input-NG').value;
 
-            addDataToTable(name, ws, code, number, ng);
+            addDataToTable(name, ws, code);
 
             const API_URL = "https://script.google.com/macros/s/AKfycby5LqJpRG0FT_to9d1Qql932xV0Zre5P60ntrX1FGhsdtAC5Nrzcc4jeYPI2yaKZik/exec";
             const options = {
                 method: 'POST',
                 contentType: 'application/json',
-                body: JSON.stringify({ name, ws, Number: number, NG: ng, class: code + "$" })
+                body: JSON.stringify({ name, ws, class: code })
             };
 
             fetch(API_URL, options)
@@ -139,14 +133,13 @@
                 .catch(err => console.error("Lỗi khi gửi dữ liệu:", err));
 
             document.querySelector('.input-code').value = '';
-            document.querySelector('.input-Number').value = '';
-            document.querySelector('.input-NG').value = '';
             document.getElementById("code").focus();
 
             play();
+            startScan(); // Mở lại camera để quét mã QR tiếp theo
         }
 
-        function addDataToTable(name, ws, code, number, ng) {
+        function addDataToTable(name, ws, code) {
             const tableBody = document.getElementById('data-table-body');
             const newRow = document.createElement('tr');
 
@@ -154,8 +147,6 @@
                 <td>${name}</td>
                 <td>${ws}</td>
                 <td>${code}</td>
-                <td>${number}</td>
-                <td>${ng}</td>
             `;
 
             tableBody.insertBefore(newRow, tableBody.firstChild);
@@ -166,22 +157,26 @@
             audio.play(); 
         }
 
-        // Tích hợp camera QR Code
-        const html5QrCode = new Html5Qrcode("reader");
-        const qrCodeSuccessCallback = (decodedText) => {
-            document.querySelector('.input-code').value = decodedText;
-            html5QrCode.stop();
-            document.getElementById("code").focus();
-            play();
-        };
+        function startScan() {
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
+            }
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    document.querySelector('.input-code').value = decodedText;
+                    html5QrCode.stop();
+                    document.getElementById("code").focus();
+                    play();
+                }
+            ).catch(err => {
+                document.getElementById("error-message").innerText = "Không thể khởi động camera: " + err;
+            });
+        }
 
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
-            qrCodeSuccessCallback
-        ).catch(err => {
-            document.getElementById("error-message").innerText = "Không thể khởi động camera: " + err;
-        });
+        // Tự động mở camera khi trang tải
+        startScan();
     </script>
 </body>
 </html>
