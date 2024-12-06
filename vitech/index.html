@@ -118,8 +118,8 @@
                 const ul = document.createElement('ul');
                 storedData.forEach((item, index) => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws} 
-                                    , Mã hàng: ${item.class}`;
+                    li.innerHTML = `<strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws} , Mã hàng: ${item.class}`;
+                                    
                     ul.appendChild(li);
                 });
                 listContent.appendChild(ul);
@@ -139,7 +139,7 @@
         function sendData() {
             if (!IsEmpty()) return;
             if (document.querySelector('.input-code').value === "") {
-                alert("Hãy nhập mã hàng hoặc quét mã QR.");
+                alert("Hãy nhập mã hàng, mã thiết bị hoặc quét mã QR.");
                 return false;
             }
 
