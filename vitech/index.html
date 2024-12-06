@@ -69,6 +69,9 @@
         <p class="control">
             <button class="button is-success" onclick="ChangeWS()">Tình trạng</button>
         </p>
+        <p class="control">
+            <button class="button is-warning" onclick="clearTemporaryData()">Xóa Danh Sách</button>
+        </p>
     </div>
 
     <!-- Các trường nhập dữ liệu -->
@@ -89,7 +92,6 @@
 
     <!-- Nút mở danh sách -->
     <button class="button is-link is-fullwidth" onclick="toggleDataContainer()">Mở Danh Sách Lưu Tạm</button>
-    <button class="button is-warning is-fullwidth" onclick="clearTemporaryData()">Xóa Danh Sách</button>
 
     <!-- Vùng hiển thị Camera QR Code -->
     <div id="reader"></div>
@@ -137,14 +139,16 @@
         function sendData() {
             if (!IsEmpty()) return;
 
-            if (document.querySelector('.input-code').value === "") {
-                alert("Hãy nhập mã thiết bị");
-                return false;
-            }
-
             const name = document.querySelector('.input-name').value;
             const ws = document.querySelector('.input-ws').value;
             const code = document.querySelector('.input-code').value;
+
+            if (temporaryData.length > 0 && temporaryData[temporaryData.length - 1].code === code) {
+                const confirmSave = confirm("Mã vừa nhập giống với mã trước đó. Bạn có muốn lưu không?");
+                if (!confirmSave) {
+                    return;
+                }
+            }
 
             // Lưu vào bộ nhớ tạm
             temporaryData.push({ name, ws, code });
