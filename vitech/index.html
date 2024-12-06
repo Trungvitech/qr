@@ -31,21 +31,28 @@
         }
 
         .scrollable-list {
-            max-height: 200px;
-            overflow-y: auto;
+            max-height: 300px; /* Chiều cao tối đa của danh sách */
+            overflow-y: auto; /* Kích hoạt cuộn dọc */
             border: 1px solid #ddd;
             padding: 10px;
             margin-top: 10px;
         }
 
-        .column-workstation { width: 15%; }
-        .column-code { width: 40%; }
+        .table.is-bordered th, .table.is-bordered td {
+            text-align: center; /* Căn giữa nội dung */
+            vertical-align: middle; /* Căn giữa theo chiều dọc */
+        }
+
+        .table.is-bordered th {
+            width: 33.33%; /* Chia đều các cột */
+        }
+
         #data-container {
-            display: none; /* Ẩn danh sách lưu tạm mặc định */
+            display: none; /* Ẩn danh sách tạm mặc định */
         }
 
         input {
-            width: 100%; /* Chiều rộng full màn hình */
+            width: 100%; /* Chiều rộng đầy đủ */
         }
 
         .input-field {
@@ -83,12 +90,12 @@
             <input class="input is-normal input-ws" placeholder="Tình trạng" id="WS">
         </div>
         <div class="input-field">
-            <input class="input is-rounded is-large input-code" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
+            <input class="input is-rounded is-large input-code" placeholder="Code" id="code" inputmode="latin" lang="en">
         </div>
     </div>
 
     <!-- Nút lưu dữ liệu -->
-    <button class="button is-danger is-fullwidth" onclick="sendData()">Save-保存</button>
+    <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
 
     <!-- Nút mở danh sách -->
     <button class="button is-link is-fullwidth" onclick="toggleDataContainer()">Mở Danh Sách Lưu Tạm</button>
@@ -99,14 +106,14 @@
 
     <!-- Bảng hiển thị dữ liệu đã nhập -->
     <div class="container is-fluid" id="data-container">
-        <h2 class="title">データ一覧 - Danh sách dữ liệu đã nhập</h2>
+        <h2 class="title">Danh sách dữ liệu đã nhập</h2>
         <div class="scrollable-list">
             <table class="table is-fullwidth is-bordered">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th class="column-workstation">Workstation</th>
-                        <th class="column-code">Code</th>
+                        <th>Tên</th>
+                        <th>Tình trạng</th>
+                        <th>Mã tài sản</th>
                     </tr>
                 </thead>
                 <tbody id="data-table-body"></tbody>
@@ -150,16 +157,13 @@
                 }
             }
 
-            // Lưu vào bộ nhớ tạm
             temporaryData.push({ name, ws, code });
-
             addDataToTable(name, ws, code);
 
-            // Gửi dữ liệu đến Google Sheets
             const API_URL = "https://script.google.com/macros/s/AKfycbzucQaPijKc98kERPjXte1BY1UGlGGAaoT9zst1MA3nffSruSKeJeE2mkIKLEPsS5iY/exec";
             const options = {
                 method: 'POST',
-                contentType: 'application/json',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, ws, class: code })
             };
 
@@ -170,9 +174,8 @@
 
             document.querySelector('.input-code').value = '';
             document.getElementById("code").focus();
-
             play();
-            startScan(); // Mở lại camera để quét mã QR tiếp theo
+            startScan();
         }
 
         function addDataToTable(name, ws, code) {
@@ -199,7 +202,7 @@
             }
             html5QrCode.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: 150 }, // Kích thước qrbox phù hợp với khung
+                { fps: 10, qrbox: 150 },
                 (decodedText) => {
                     document.querySelector('.input-code').value = decodedText;
                     html5QrCode.stop();
@@ -217,13 +220,12 @@
         }
 
         function clearTemporaryData() {
-            temporaryData = []; // Xóa bộ nhớ tạm
+            temporaryData = [];
             const tableBody = document.getElementById('data-table-body');
-            tableBody.innerHTML = ''; // Xóa dữ liệu hiển thị trên bảng
+            tableBody.innerHTML = '';
             alert("Danh sách tạm đã được xóa!");
         }
 
-        // Tự động mở camera khi trang tải
         startScan();
     </script>
 </body>
