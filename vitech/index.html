@@ -83,7 +83,7 @@
             <input class="input is-normal input-ws" placeholder="Tình trạng" id="WS">
         </div>
         <div class="input-field">
-            <input class="input is-rounded is-large input-code" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
+            <input class="input is-rounded is-large input-code" placeholder="CodeーMã tài sản" id="code" inputmode="latin" lang="en">
         </div>
     </div>
 
@@ -99,14 +99,14 @@
 
     <!-- Bảng hiển thị dữ liệu đã nhập -->
     <div class="container is-fluid" id="data-container">
-        <h2 class="title">Danh sách dữ liệu đã nhập</h2>
+        <h2 class="title"> Danh sách dữ liệu đã nhập</h2>
         <div class="scrollable-list">
             <table class="table is-fullwidth is-bordered">
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th class="column-workstation">Tình trạngtrạng</th>
-                        <th class="column-code">Code</th>
+                        <th class="column-workstation">Tình trạng</th>
+                        <th class="column-code">Code-Mã tài sản</th>
                     </tr>
                 </thead>
                 <tbody id="data-table-body"></tbody>
@@ -143,11 +143,14 @@
             const ws = document.querySelector('.input-ws').value;
             const code = document.querySelector('.input-code').value;
 
+            if (!code.trim()) {
+                alert("Trường Code không được để trống. Vui lòng nhập mã!");
+                return;
+            }
+
             if (temporaryData.length > 0 && temporaryData[temporaryData.length - 1].code === code) {
-                const confirmSave = confirm("Mã vừa nhập giống với mã trước đó. Bạn có muốn lưu không?");
-                if (!confirmSave) {
-                    return;
-                }
+                alert("Mã vừa nhập giống với mã trước đó. Vui lòng kiểm tra lại!");
+                return;
             }
 
             // Lưu vào bộ nhớ tạm
