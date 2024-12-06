@@ -83,6 +83,7 @@
 
     <!-- Nút mở danh sách -->
     <button class="button is-link is-fullwidth" onclick="toggleDataContainer()">Mở Danh Sách Lưu Tạm</button>
+    <button class="button is-warning is-fullwidth" onclick="clearTemporaryData()">Xóa Danh Sách</button>
 
     <!-- Vùng hiển thị Camera QR Code -->
     <div style="width: 800px; margin: 0 auto;" id="reader"></div>
@@ -107,6 +108,7 @@
 
     <script>
         let html5QrCode;
+        let temporaryData = []; // Bộ nhớ tạm để lưu dữ liệu
 
         function ChangeName() {
             document.querySelector('.input-name').value = '';
@@ -130,7 +132,7 @@
             if (!IsEmpty()) return;
 
             if (document.querySelector('.input-code').value === "") {
-                alert("Hãy nhập mã hàng");
+                alert("Hãy nhập mã thiết bị");
                 return false;
             }
 
@@ -138,8 +140,12 @@
             const ws = document.querySelector('.input-ws').value;
             const code = document.querySelector('.input-code').value;
 
+            // Lưu vào bộ nhớ tạm
+            temporaryData.push({ name, ws, code });
+
             addDataToTable(name, ws, code);
 
+            // Gửi dữ liệu đến Google Sheets
             const API_URL = "https://script.google.com/macros/s/AKfycbzucQaPijKc98kERPjXte1BY1UGlGGAaoT9zst1MA3nffSruSKeJeE2mkIKLEPsS5iY/exec";
             const options = {
                 method: 'POST',
@@ -198,6 +204,13 @@
         function toggleDataContainer() {
             const container = document.getElementById('data-container');
             container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function clearTemporaryData() {
+            temporaryData = []; // Xóa bộ nhớ tạm
+            const tableBody = document.getElementById('data-table-body');
+            tableBody.innerHTML = ''; // Xóa dữ liệu hiển thị trên bảng
+            alert("Danh sách tạm đã được xóa!");
         }
 
         // Tự động mở camera khi trang tải
