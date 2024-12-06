@@ -48,12 +48,15 @@
         <p class="control">
             <button class="button is-warning" onclick="ChangeCode()">QR-Code</button>
         </p>
+        <p class="control">
+            <button class="button is-danger is-fullwidth" onclick="clearTempData()">Xóa Bộ Nhớ Tạm</button>
+        </p>
     </div>
 
     <input class="input is-normal input-name is-fullwidth" placeholder="Người kiểm" id="Name">
     <input class="input is-normal input-ws is-fullwidth" placeholder="Nội dung" id="WS">
     <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
-    <input class="input is-normal is-warning input-Number" placeholder="Tình trạng" id="Number-code">
+    <input class="input is-normal is-large input-Number" placeholder="Tình trạng" id="Number-code">
     
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
     <button class="button is-primary is-fullwidth" onclick="showTempData()">Xem Danh Sách</button>
