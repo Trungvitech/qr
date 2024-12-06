@@ -43,20 +43,18 @@
             <button class="button is-info" onclick="ChangeName()">Tên</button>
         </p>
         <p class="control">
-            <button class="button is-success" onclick="ChangeWS()">Nội dung</button>
+            <button class="button is-success" onclick="ChangeWS()">Tình trạng</button>
         </p>
         <p class="control">
             <button class="button is-warning" onclick="ChangeCode()">QR-Code</button>
         </p>
-        <p class="control">
-            <button class="button is-danger is-fullwidth" onclick="ChangeTT()">Tình trạng</button>
-        </p>
+       
     </div>
 
     <input class="input is-normal input-name is-fullwidth" placeholder="Người kiểm" id="Name">
-    <input class="input is-normal input-ws is-fullwidth" placeholder="Nội dung" id="WS">
     <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
-    <input class="input is-normal is-large input-TT" placeholder="Tình trạng" id="TT">
+    <input class="input is-normal input-ws is-fullwidth" placeholder="Tình trạng" id="WS">
+    
     
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
     <button class="button is-primary is-fullwidth" onclick="showTempData()">Xem Danh Sách</button>
@@ -89,14 +87,11 @@
             document.querySelector('.input-code').value = '';
             document.getElementById("code").focus();
         }
-         function ChangeTT() {
-            document.querySelector('.input-TT').value = '';
-            document.getElementById("TT").focus();
-        }
+        
         // Check if WS is empty
         function IsEmpty() {
             if (document.querySelector('.input-ws').value === "") {
-                alert("Hãy nhập nội dung công việc của bạn");
+                alert("Hãy nhập nội dung công việc của bạn, hoặc tình trạng của trang thiết bị");
                 return false;
             }
             return true;
@@ -123,8 +118,8 @@
                 const ul = document.createElement('ul');
                 storedData.forEach((item, index) => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws}, 
-                                    Tình trạng: ${item.TT}, Mã hàng: ${item.class}`;
+                    li.innerHTML = `<strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws} 
+                                    , Mã hàng: ${item.class}`;
                     ul.appendChild(li);
                 });
                 listContent.appendChild(ul);
@@ -151,7 +146,6 @@
             const data = {
                 name: document.querySelector('.input-name').value,
                 ws: document.querySelector('.input-ws').value,
-                TT: document.querySelector('.input-TT').value,
                 class: document.querySelector('.input-code').value
             };
 
@@ -167,7 +161,6 @@
                 .then(res => {
                     console.log(res);
                     document.querySelector('.input-code').value = '';
-                    document.querySelector('.input-TT').value = '';
                     document.getElementById("code").focus();
                     play();
                     saveToLocalStorage(data);
