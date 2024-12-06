@@ -31,28 +31,21 @@
         }
 
         .scrollable-list {
-            max-height: 300px; /* Chiều cao tối đa của danh sách */
-            overflow-y: auto; /* Kích hoạt cuộn dọc */
+            max-height: 200px;
+            overflow-y: auto;
             border: 1px solid #ddd;
             padding: 10px;
             margin-top: 10px;
         }
 
-        .table.is-bordered th, .table.is-bordered td {
-            text-align: center; /* Căn giữa nội dung */
-            vertical-align: middle; /* Căn giữa theo chiều dọc */
-        }
-
-        .table.is-bordered th {
-            width: 33.33%; /* Chia đều các cột */
-        }
-
+        .column-workstation { width: 15%; }
+        .column-code { width: 40%; }
         #data-container {
-            display: none; /* Ẩn danh sách tạm mặc định */
+            display: none; /* Ẩn danh sách lưu tạm mặc định */
         }
 
         input {
-            width: 100%; /* Chiều rộng đầy đủ */
+            width: 100%; /* Chiều rộng full màn hình */
         }
 
         .input-field {
@@ -112,8 +105,8 @@
                 <thead>
                     <tr>
                         <th>Tên</th>
-                        <th>Tình trạng</th>
-                        <th>Mã tài sản</th>
+                        <th class="column-workstation">Tình trạng</th>
+                        <th class="column-code">Mã tài sản</th>
                     </tr>
                 </thead>
                 <tbody id="data-table-body"></tbody>
@@ -157,13 +150,16 @@
                 }
             }
 
+            // Lưu vào bộ nhớ tạm
             temporaryData.push({ name, ws, code });
+
             addDataToTable(name, ws, code);
 
+            // Gửi dữ liệu đến Google Sheets
             const API_URL = "https://script.google.com/macros/s/AKfycbzucQaPijKc98kERPjXte1BY1UGlGGAaoT9zst1MA3nffSruSKeJeE2mkIKLEPsS5iY/exec";
             const options = {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                contentType: 'application/json',
                 body: JSON.stringify({ name, ws, class: code })
             };
 
@@ -174,19 +170,20 @@
 
             document.querySelector('.input-code').value = '';
             document.getElementById("code").focus();
+
             play();
-            startScan();
+            startScan(); // Mở lại camera để quét mã QR tiếp theo
         }
 
         function addDataToTable(name, ws, code) {
             const tableBody = document.getElementById('data-table-body');
             const newRow = document.createElement('tr');
 
-            newRow.innerHTML = `
+            newRow.innerHTML = 
                 <td>${name}</td>
                 <td>${ws}</td>
                 <td>${code}</td>
-            `;
+            ;
 
             tableBody.insertBefore(newRow, tableBody.firstChild);
         }
@@ -202,7 +199,7 @@
             }
             html5QrCode.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: 150 },
+                { fps: 10, qrbox: 150 }, // Kích thước qrbox phù hợp với khung
                 (decodedText) => {
                     document.querySelector('.input-code').value = decodedText;
                     html5QrCode.stop();
@@ -220,12 +217,13 @@
         }
 
         function clearTemporaryData() {
-            temporaryData = [];
+            temporaryData = []; // Xóa bộ nhớ tạm
             const tableBody = document.getElementById('data-table-body');
-            tableBody.innerHTML = '';
+            tableBody.innerHTML = ''; // Xóa dữ liệu hiển thị trên bảng
             alert("Danh sách tạm đã được xóa!");
         }
 
+        // Tự động mở camera khi trang tải
         startScan();
     </script>
 </body>
