@@ -37,31 +37,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.0.3/html5-qrcode.min.js"></script>
 </head>
 <body>
-    <!-- Input fields -->
     <div class="field is-grouped">
         <p class="control">
             <button class="button is-info" onclick="ChangeName()">Tên</button>
         </p>
         <p class="control">
-            <button class="button is-success" onclick="ChangeWS()">Tình trạng</button>
+            <button class="button is-success" onclick="ChangeWS()">Nội dung</button>
         </p>
         <p class="control">
             <button class="button is-warning" onclick="ChangeCode()">QR-Code</button>
         </p>
-       
     </div>
 
     <input class="input is-normal input-name is-fullwidth" placeholder="Người kiểm" id="Name">
+    <input class="input is-normal input-ws is-fullwidth" placeholder="Nội dung" id="WS">
     <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
-    <input class="input is-normal input-ws is-fullwidth" placeholder="Tình trạng" id="WS">
+    <input class="input is-normal is-warning input-Number" placeholder="Tình trạng" id="Number-code">
     
-    
+
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
     <button class="button is-primary is-fullwidth" onclick="showTempData()">Xem Danh Sách</button>
-
-    <!-- Temporary data list -->
+    
     <div id="temp-list" style="display:none; margin-top: 20px;">
-        <button class="button is-danger is-fullwidth" onclick="clearTempData()">Xóa Bộ Nhớ Tạm</button>
         <h3 class="title is-4">Dữ Liệu Đã Lưu</h3>
         <div id="list-content"></div>
     </div>
@@ -72,7 +69,6 @@
     <script>
         let html5QrCode;
 
-        // Clear and focus input fields
         function ChangeName() {
             document.querySelector('.input-name').value = '';
             document.getElementById("Name").focus();
@@ -87,24 +83,21 @@
             document.querySelector('.input-code').value = '';
             document.getElementById("code").focus();
         }
-        
-        // Check if WS is empty
+
         function IsEmpty() {
             if (document.querySelector('.input-ws').value === "") {
-                alert("Hãy nhập nội dung công việc của bạn, hoặc tình trạng của trang thiết bị");
+                alert("Hãy nhập nội dung công việc của bạn");
                 return false;
             }
             return true;
         }
 
-        // Save data to localStorage
         function saveToLocalStorage(data) {
             let storedData = JSON.parse(localStorage.getItem('tempData')) || [];
-            storedData.unshift(data); // Add the newest data to the beginning
+            storedData.push(data);
             localStorage.setItem('tempData', JSON.stringify(storedData));
         }
 
-        // Display temporary data
         function showTempData() {
             const tempList = document.getElementById('temp-list');
             const listContent = document.getElementById('list-content');
@@ -118,41 +111,34 @@
                 const ul = document.createElement('ul');
                 storedData.forEach((item, index) => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws} , Mã hàng: ${item.class}`;
-                                    
+                    li.innerHTML = <strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws}, 
+                                    Số lượng: ${item.Number}, Mã hàng: ${item.class}, 
+                                    Tình trạng: ${item.NG};
                     ul.appendChild(li);
                 });
                 listContent.appendChild(ul);
             }
         }
 
-        // Clear temporary data
-        function clearTempData() {
-            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ danh sách?")) {
-                localStorage.removeItem('tempData');
-                document.getElementById('list-content').innerHTML = '<p>Không có dữ liệu nào trong bộ nhớ tạm.</p>';
-                alert("Đã xóa toàn bộ danh sách.");
-            }
-        }
-
-        // Send data to Google Apps Script
         function sendData() {
             if (!IsEmpty()) return;
             if (document.querySelector('.input-code').value === "") {
-                alert("Hãy nhập mã hàng, mã thiết bị hoặc quét mã QR.");
+                alert("Hãy nhập mã hàng hoặc quét mã QR.");
                 return false;
             }
 
             const data = {
                 name: document.querySelector('.input-name').value,
                 ws: document.querySelector('.input-ws').value,
+                Number: document.querySelector('.input-Number').value,
+             
                 class: document.querySelector('.input-code').value
             };
 
-            const API_URL = "https://script.google.com/macros/s/AKfycbz3YZvziIPBC7DrDzynPJKgO2IdJh7gVNn_Im--cYBhY4rmmdWHMZZtdCbaDaRb59yL/exec";
+            const API_URL = "https://script.google.com/macros/s/AKfycbyv-Cmw9zfBsRKAo_Nu6dyXDLuPmdmdXrXjlTUhUN3O5E_WaFtt7uEUlSVOmJspmcu7/exec";
             const options = {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                contentType: 'application/json',
                 body: JSON.stringify(data)
             };
 
@@ -161,24 +147,22 @@
                 .then(res => {
                     console.log(res);
                     document.querySelector('.input-code').value = '';
+                    document.querySelector('.input-Number').value = '';
+                   
                     document.getElementById("code").focus();
                     play();
+
                     saveToLocalStorage(data);
+
                     startScan();
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("Đã xảy ra lỗi khi gửi dữ liệu.");
                 });
         }
 
-        // Play sound effect
         function play() {
             var audio = new Audio('https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3');
             audio.play();
         }
 
-        // QR code scanning
         function onScanSuccess(qrCodeMessage) {
             document.querySelector('.input-code').value = qrCodeMessage;
             html5QrCode.stop();
@@ -190,7 +174,6 @@
             html5QrCode.start({ facingMode: "environment" }, { fps: 5, qrbox: 450 }, onScanSuccess);
         }
 
-        // Initialize QR code scanning
         startScan();
     </script>
 </body>
