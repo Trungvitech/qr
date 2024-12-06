@@ -62,33 +62,29 @@
     </div>
 
     <!-- Các trường nhập dữ liệu -->
-    <input class="input is-normal input-name is-fullwidth" placeholder="Nameー名前" id="Name">
-    <input class="input is-normal input-ws is-fullwidth" placeholder="Work stationー工程ー機械ー場所" id="WS">
-    <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
-    <input class="input is-normal is-large input-Number" placeholder="Number-数量" id="Number-code">
-
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">不良/不足数</label>
-        </div>
-        <div class="field-body">
-            <div class="field">
-                <p class="control">
-                    <input class="input is-small input-NG" placeholder="不良数/不足数-Số hàng hỏng hoặc thiếu" id="NG-code">
-                </p>
-            </div>
+    <div id="input-fields">
+        <input class="input is-normal input-name is-fullwidth" placeholder="Nameー名前" id="Name">
+        <input class="input is-normal input-ws is-fullwidth" placeholder="Work stationー工程ー機械ー場所" id="WS">
+        <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
+        <div id="optional-fields" style="display: none;">
+            <input class="input is-normal is-large input-Number" placeholder="Number-数量" id="Number-code">
+            <input class="input is-small input-NG" placeholder="不良数/不足数-Số hàng hỏng hoặc thiếu" id="NG-code">
         </div>
     </div>
+    <button class="button is-info" onclick="toggleOptionalFields()">Thêm/Sửa Thông Tin Chi Tiết</button>
 
     <!-- Nút lưu dữ liệu -->
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save-保存</button>
+
+    <!-- Nút ẩn/hiện danh sách -->
+    <button class="button is-link is-fullwidth" onclick="toggleDataList()">Ẩn/Hiện Danh Sách</button>
 
     <!-- Vùng hiển thị Camera QR Code -->
     <div style="width: 800px; margin: 0 auto;" id="reader"></div>
     <div id="error-message" style="color: red; text-align: center; margin-top: 10px;"></div>
 
     <!-- Bảng hiển thị dữ liệu đã nhập -->
-    <div class="container is-fluid" id="data-container">
+    <div class="container is-fluid" id="data-container" style="display: none;">
         <section class="hero is-small is-primary">
             <div class="hero-body">
                 <p class="title">大島工作所-電子日報 - design by NGUYEN THANH MINH</p>
@@ -138,6 +134,16 @@
                 return false;
             }
             return true;
+        }
+
+        function toggleDataList() {
+            const dataContainer = document.getElementById('data-container');
+            dataContainer.style.display = dataContainer.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleOptionalFields() {
+            const optionalFields = document.getElementById('optional-fields');
+            optionalFields.style.display = optionalFields.style.display === 'none' ? 'block' : 'none';
         }
 
         function sendData() {
@@ -195,88 +201,6 @@
             var audio = new Audio('https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3'); 
             audio.play(); 
         }
-
-        let html5QrCode;
-        const config = { fps: 5, qrbox: 450 };
-
-        function qrCodeSuccessCallback(message) {
-            onScanSuccess(message);
-        }
-
-        function onScanSuccess(qrCodeMessage) {
-            html5QrCode.stop();
-
-            const name = document.querySelector('.input-name').value;
-            const ws = document.querySelector('.input-ws').value;
-            const number = document.querySelector('.input-Number').value;
-            const ng = document.querySelector('.input-NG').value;
-
-            addDataToTable(name, ws, qrCodeMessage, number, ng);
-
-            const options = {
-                method: 'POST',
-                contentType: 'application/json',
-                body: JSON.stringify({ name, ws, Number: number, NG: ng, class: qrCodeMessage + "$" })
-            };
-
-            fetch(API_URL, options)
-                .then(response => response.json())
-                .then(data => startScan())
-                .catch(err => console.error("Lỗi khi gửi dữ liệu:", err));
-
-            document.querySelector('.input-code').value = '';
-            document.querySelector('.input-Number').value = '';
-            document.querySelector('.input-NG').value = '';
-        }
-
-        function startScan() {
-            if (!IsEmpty()) return;
-            document.getElementById('reader').innerHTML = '';
-            html5QrCode = new Html5Qrcode('reader');
-
-            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
-                .then(() => {
-                    document.getElementById('data-container').classList.add('shift-down');
-                })
-                .catch(err => {
-                    console.error("Lỗi khi khởi động camera:", err);
-                    document.getElementById('error-message').innerText = "Không thể khởi động camera. Vui lòng kiểm tra quyền truy cập camera và thử lại.";
-                });
-
-            play();
-        }
-
-        function stopScan() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    document.getElementById('data-container').classList.remove('shift-down');
-                }).catch(err => console.error("Lỗi khi dừng camera:", err));
-            }
-        }
-
-        startScan();
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const inputs = document.querySelectorAll('input');
-
-            inputs.forEach((input, index) => {
-                input.addEventListener('keydown', function (event) {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                        const nextInput = inputs[index + 1];
-                        if (nextInput) {
-                            nextInput.focus();
-                        } else {
-                            document.querySelector('.button.is-info').focus();
-                        }
-                    }
-                });
-            });
-            
-            document.getElementById('code').addEventListener('input', function () {
-                this.value = this.value.replace(/[^a-zA-Z0-9!@#$%^&*()-_=+\[\]{}|;:',.< >?/\\]/g, '');
-            });
-        });
     </script>
 </body>
 </html>
