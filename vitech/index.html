@@ -51,6 +51,12 @@
         .input-field {
             margin-bottom: 20px; /* Khoảng cách giữa các input */
         }
+
+        #reader {
+            width: 100%; /* Đặt khung camera ngang bằng input */
+            max-width: 500px; /* Giới hạn chiều rộng tối đa */
+            margin: 0 auto;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.0.3/html5-qrcode.min.js"></script>
 </head>
@@ -86,7 +92,7 @@
     <button class="button is-warning is-fullwidth" onclick="clearTemporaryData()">Xóa Danh Sách</button>
 
     <!-- Vùng hiển thị Camera QR Code -->
-    <div style="width: 800px; margin: 0 auto;" id="reader"></div>
+    <div id="reader"></div>
     <div id="error-message" style="color: red; text-align: center; margin-top: 10px;"></div>
 
     <!-- Bảng hiển thị dữ liệu đã nhập -->
@@ -189,7 +195,7 @@
             }
             html5QrCode.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
+                { fps: 10, qrbox: 150 }, // Kích thước qrbox phù hợp với khung
                 (decodedText) => {
                     document.querySelector('.input-code').value = decodedText;
                     html5QrCode.stop();
