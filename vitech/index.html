@@ -52,7 +52,7 @@
     <input class="input is-normal input-name is-fullwidth" placeholder="Người kiểm" id="Name">
     <input class="input is-normal input-ws is-fullwidth" placeholder="Nội dung" id="WS">
     <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
-    <input class="input is-normal is-warning input-Number" placeholder="Tình trạng" id="Number-code">
+    
     
 
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
@@ -112,8 +112,7 @@
                 storedData.forEach((item, index) => {
                     const li = document.createElement('li');
                     li.innerHTML = <strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws}, 
-                                    Số lượng: ${item.Number}, Mã hàng: ${item.class}, 
-                                    Tình trạng: ${item.NG};
+                                     Mã hàng: ${item.class} ;
                     ul.appendChild(li);
                 });
                 listContent.appendChild(ul);
@@ -130,8 +129,6 @@
             const data = {
                 name: document.querySelector('.input-name').value,
                 ws: document.querySelector('.input-ws').value,
-                Number: document.querySelector('.input-Number').value,
-             
                 class: document.querySelector('.input-code').value
             };
 
@@ -147,7 +144,6 @@
                 .then(res => {
                     console.log(res);
                     document.querySelector('.input-code').value = '';
-                    document.querySelector('.input-Number').value = '';
                    
                     document.getElementById("code").focus();
                     play();
