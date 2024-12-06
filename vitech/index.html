@@ -39,10 +39,10 @@
 <body>
     <div class="field is-grouped">
         <p class="control">
-            <button class="button is-info" onclick="ChangeName()">Tên </button>
+            <button class="button is-info" onclick="ChangeName()">Tên</button>
         </p>
         <p class="control">
-            <button class="button is-success" onclick="ChangeWS()">Bộ phận</button>
+            <button class="button is-success" onclick="ChangeWS()">Nội dung</button>
         </p>
         <p class="control">
             <button class="button is-warning" onclick="ChangeCode()">QR-Code</button>
@@ -50,34 +50,24 @@
     </div>
 
     <input class="input is-normal input-name is-fullwidth" placeholder="Người kiểm" id="Name">
-    <input class="input is-normal input-ws is-fullwidth" placeholder="Bộ phận" id="WS">
-    <input class="input is-normal is-warning input-Number" placeholder="Số lượng" id="Number-code">
+    <input class="input is-normal input-ws is-fullwidth" placeholder="Nội dung" id="WS">
     <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
+    <input class="input is-normal is-warning input-Number" placeholder="Tình trạng" id="Number-code">
     
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Tình trạng</label>
-        </div>
-        <div class="field-body">
-            <div class="field">
-                <p class="control">
-                    <input class="input is-small input-NG" placeholder="ghi ngắn gọn tình trạng của thiết bị" id="NG-code">
-                </p>
-            </div>
-        </div>
-    </div>
 
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
+    <button class="button is-primary is-fullwidth" onclick="showTempData()">Xem Danh Sách</button>
+    
+    <div id="temp-list" style="display:none; margin-top: 20px;">
+        <h3 class="title is-4">Dữ Liệu Đã Lưu</h3>
+        <div id="list-content"></div>
+    </div>
 
     <!-- Camera QR Code Reader -->
     <div id="reader"></div>
 
     <script>
         let html5QrCode;
-
-        function openPage() {
-            window.open("https://ohshima-kousakusho.github.io/tana1/", "_blank");
-        }
 
         function ChangeName() {
             document.querySelector('.input-name').value = '';
@@ -102,6 +92,34 @@
             return true;
         }
 
+        function saveToLocalStorage(data) {
+            let storedData = JSON.parse(localStorage.getItem('tempData')) || [];
+            storedData.push(data);
+            localStorage.setItem('tempData', JSON.stringify(storedData));
+        }
+
+        function showTempData() {
+            const tempList = document.getElementById('temp-list');
+            const listContent = document.getElementById('list-content');
+            tempList.style.display = tempList.style.display === 'none' ? 'block' : 'none';
+
+            const storedData = JSON.parse(localStorage.getItem('tempData')) || [];
+            listContent.innerHTML = '';
+            if (storedData.length === 0) {
+                listContent.innerHTML = '<p>Không có dữ liệu nào trong bộ nhớ tạm.</p>';
+            } else {
+                const ul = document.createElement('ul');
+                storedData.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws}, 
+                                    Số lượng: ${item.Number}, Mã hàng: ${item.class}, 
+                                    Tình trạng: ${item.NG}`;
+                    ul.appendChild(li);
+                });
+                listContent.appendChild(ul);
+            }
+        }
+
         function sendData() {
             if (!IsEmpty()) return;
             if (document.querySelector('.input-code').value === "") {
@@ -109,29 +127,33 @@
                 return false;
             }
 
+            const data = {
+                name: document.querySelector('.input-name').value,
+                ws: document.querySelector('.input-ws').value,
+                Number: document.querySelector('.input-Number').value,
+                NG: document.querySelector('.input-NG').value,
+                class: document.querySelector('.input-code').value
+            };
+
             const API_URL = "https://script.google.com/macros/s/AKfycbzwz-HHJd_QSYhV-uLoAtMOc413a1BbBUFBKiu9ge1n_vF1BHF2eM43PoAIOF1pcH8E_g/exec";
             const options = {
                 method: 'POST',
                 contentType: 'application/json',
-                body: JSON.stringify({
-                    name: document.querySelector('.input-name').value,
-                    ws: document.querySelector('.input-ws').value,
-                    Number: document.querySelector('.input-Number').value,
-                    NG: document.querySelector('.input-NG').value,
-                    class: document.querySelector('.input-code').value
-                })
+                body: JSON.stringify(data)
             };
 
             fetch(API_URL, options)
                 .then(response => response.json())
-                .then(data => {
-                    console.log(data);
+                .then(res => {
+                    console.log(res);
                     document.querySelector('.input-code').value = '';
                     document.querySelector('.input-Number').value = '';
                     document.querySelector('.input-NG').value = '';
                     document.getElementById("code").focus();
                     play();
-                    // Khởi động lại camera
+
+                    saveToLocalStorage(data);
+
                     startScan();
                 });
         }
@@ -142,8 +164,8 @@
         }
 
         function onScanSuccess(qrCodeMessage) {
-            document.querySelector('.input-code').value = qrCodeMessage; // Gán giá trị vào input
-            html5QrCode.stop(); // Dừng camera sau khi quét thành công
+            document.querySelector('.input-code').value = qrCodeMessage;
+            html5QrCode.stop();
         }
 
         function startScan() {
@@ -152,7 +174,7 @@
             html5QrCode.start({ facingMode: "environment" }, { fps: 5, qrbox: 450 }, onScanSuccess);
         }
 
-        startScan(); // Bắt đầu quét QR code
+        startScan();
     </script>
 </body>
 </html>
