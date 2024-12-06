@@ -37,6 +37,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.0.3/html5-qrcode.min.js"></script>
 </head>
 <body>
+    <!-- Input fields -->
     <div class="field is-grouped">
         <p class="control">
             <button class="button is-info" onclick="ChangeName()">Tên</button>
@@ -54,11 +55,12 @@
     <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
     <input class="input is-normal is-warning input-Number" placeholder="Tình trạng" id="Number-code">
     
-
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
     <button class="button is-primary is-fullwidth" onclick="showTempData()">Xem Danh Sách</button>
-    
+
+    <!-- Temporary data list -->
     <div id="temp-list" style="display:none; margin-top: 20px;">
+        <button class="button is-danger is-fullwidth" onclick="clearTempData()">Xóa Bộ Nhớ Tạm</button>
         <h3 class="title is-4">Dữ Liệu Đã Lưu</h3>
         <div id="list-content"></div>
     </div>
@@ -69,6 +71,7 @@
     <script>
         let html5QrCode;
 
+        // Clear and focus input fields
         function ChangeName() {
             document.querySelector('.input-name').value = '';
             document.getElementById("Name").focus();
@@ -84,6 +87,7 @@
             document.getElementById("code").focus();
         }
 
+        // Check if WS is empty
         function IsEmpty() {
             if (document.querySelector('.input-ws').value === "") {
                 alert("Hãy nhập nội dung công việc của bạn");
@@ -92,12 +96,14 @@
             return true;
         }
 
+        // Save data to localStorage
         function saveToLocalStorage(data) {
             let storedData = JSON.parse(localStorage.getItem('tempData')) || [];
-            storedData.push(data);
+            storedData.unshift(data); // Add the newest data to the beginning
             localStorage.setItem('tempData', JSON.stringify(storedData));
         }
 
+        // Display temporary data
         function showTempData() {
             const tempList = document.getElementById('temp-list');
             const listContent = document.getElementById('list-content');
@@ -112,14 +118,23 @@
                 storedData.forEach((item, index) => {
                     const li = document.createElement('li');
                     li.innerHTML = `<strong>${index + 1}:</strong> Tên: ${item.name}, Bộ phận: ${item.ws}, 
-                                    Số lượng: ${item.Number}, Mã hàng: ${item.class}, 
-                                    Tình trạng: ${item.NG}`;
+                                    Tình trạng: ${item.Number}, Mã hàng: ${item.class}`;
                     ul.appendChild(li);
                 });
                 listContent.appendChild(ul);
             }
         }
 
+        // Clear temporary data
+        function clearTempData() {
+            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ danh sách?")) {
+                localStorage.removeItem('tempData');
+                document.getElementById('list-content').innerHTML = '<p>Không có dữ liệu nào trong bộ nhớ tạm.</p>';
+                alert("Đã xóa toàn bộ danh sách.");
+            }
+        }
+
+        // Send data to Google Apps Script
         function sendData() {
             if (!IsEmpty()) return;
             if (document.querySelector('.input-code').value === "") {
@@ -131,14 +146,13 @@
                 name: document.querySelector('.input-name').value,
                 ws: document.querySelector('.input-ws').value,
                 Number: document.querySelector('.input-Number').value,
-             
                 class: document.querySelector('.input-code').value
             };
 
             const API_URL = "https://script.google.com/macros/s/AKfycbznmW1KItuqilVwpBf3s_iQnEDGigDsJkLbLiBI-9q1nZljvMbT9mQTyAPLRuiCLPjqTA/exec";
             const options = {
                 method: 'POST',
-                contentType: 'application/json',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             };
 
@@ -148,21 +162,24 @@
                     console.log(res);
                     document.querySelector('.input-code').value = '';
                     document.querySelector('.input-Number').value = '';
-                   
                     document.getElementById("code").focus();
                     play();
-
                     saveToLocalStorage(data);
-
                     startScan();
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Đã xảy ra lỗi khi gửi dữ liệu.");
                 });
         }
 
+        // Play sound effect
         function play() {
             var audio = new Audio('https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3');
             audio.play();
         }
 
+        // QR code scanning
         function onScanSuccess(qrCodeMessage) {
             document.querySelector('.input-code').value = qrCodeMessage;
             html5QrCode.stop();
@@ -174,6 +191,7 @@
             html5QrCode.start({ facingMode: "environment" }, { fps: 5, qrbox: 450 }, onScanSuccess);
         }
 
+        // Initialize QR code scanning
         startScan();
     </script>
 </body>
