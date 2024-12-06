@@ -83,7 +83,7 @@
             <input class="input is-normal input-ws" placeholder="Tình trạng" id="WS">
         </div>
         <div class="input-field">
-            <input class="input is-rounded is-large input-code" placeholder="Code" id="code" inputmode="latin" lang="en">
+            <input class="input is-rounded is-large input-code" placeholder="Codeー図面コード" id="code" inputmode="latin" lang="en">
         </div>
     </div>
 
@@ -104,9 +104,9 @@
             <table class="table is-fullwidth is-bordered">
                 <thead>
                     <tr>
-                        <th>Tên</th>
-                        <th class="column-workstation">Tình trạng</th>
-                        <th class="column-code">Mã tài sản</th>
+                        <th>Name</th>
+                        <th class="column-workstation">Tình trạngtrạng</th>
+                        <th class="column-code">Code</th>
                     </tr>
                 </thead>
                 <tbody id="data-table-body"></tbody>
@@ -179,11 +179,11 @@
             const tableBody = document.getElementById('data-table-body');
             const newRow = document.createElement('tr');
 
-            newRow.innerHTML = 
+            newRow.innerHTML = `
                 <td>${name}</td>
                 <td>${ws}</td>
                 <td>${code}</td>
-            ;
+            `;
 
             tableBody.insertBefore(newRow, tableBody.firstChild);
         }
