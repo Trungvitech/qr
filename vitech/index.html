@@ -49,14 +49,14 @@
             <button class="button is-warning" onclick="ChangeCode()">QR-Code</button>
         </p>
         <p class="control">
-            <button class="button is-danger is-fullwidth" onclick="clearTempData()">Xóa Bộ Nhớ Tạm</button>
+            <button class="button is-danger is-fullwidth" onclick="ChangTT()">Tình trạng</button>
         </p>
     </div>
 
     <input class="input is-normal input-name is-fullwidth" placeholder="Người kiểm" id="Name">
     <input class="input is-normal input-ws is-fullwidth" placeholder="Nội dung" id="WS">
     <input class="input is-rounded is-large input-code is-fullwidth" placeholder="Code" id="code">
-    <input class="input is-normal is-large input-Number" placeholder="Tình trạng" id="Number-code">
+    <input class="input is-normal is-large input-TT" placeholder="Tình trạng" id="TT">
     
     <button class="button is-danger is-fullwidth" onclick="sendData()">Save</button>
     <button class="button is-primary is-fullwidth" onclick="showTempData()">Xem Danh Sách</button>
@@ -89,7 +89,10 @@
             document.querySelector('.input-code').value = '';
             document.getElementById("code").focus();
         }
-
+         function ChangeTT() {
+            document.querySelector('.input-TT').value = '';
+            document.getElementById("TT").focus();
+        }
         // Check if WS is empty
         function IsEmpty() {
             if (document.querySelector('.input-ws').value === "") {
@@ -148,7 +151,7 @@
             const data = {
                 name: document.querySelector('.input-name').value,
                 ws: document.querySelector('.input-ws').value,
-                Number: document.querySelector('.input-Number').value,
+                Number: document.querySelector('.input-TT').value,
                 class: document.querySelector('.input-code').value
             };
 
@@ -164,7 +167,7 @@
                 .then(res => {
                     console.log(res);
                     document.querySelector('.input-code').value = '';
-                    document.querySelector('.input-Number').value = '';
+                    document.querySelector('.input-TT').value = '';
                     document.getElementById("code").focus();
                     play();
                     saveToLocalStorage(data);
